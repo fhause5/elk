@@ -1,0 +1,348 @@
+
+#Удаляем конкретную строчку
+sed -i '18d' ~/.ssh/known_hosts
+
+getenforce
+
+Ищем в centOS файл
+rpm -qc filebeat
+
+[ ElasticSearch 4 ] Monitoring System Logs and Metrics in ELK Stack
+Add Data to Kibana and install Filebeat
+"Getting Started Guide"
+
+Go to client
+# checkfirewalld
+sudo systemctl status firewalld
+install filebeat
+https://www.elastic.co/guide/en/beats/filebeat/6.5/setup-repositories.html
+systemctl enable filebeat
+systemctl start filebeat
+systemctl status filebeat
+
+nano /etc/filebeat/filebeat.yml
+
+search kibana
+# Write kibana URL
+host: "192.168.0.102:5601"
+search Elasticsearch output
+hosts: ["192.168.0.102:9200"]
+
+check test, version, modules
+sudo filebeat test output
+sudo filebeat version
+sudo filebeat modules list
+sudo filebeat modules enable system
+
+# Check if module enabled
+sudo filebeat modules list
+sudo nano /etc/filebeat/modules.d/system.yml
+uncomment the string if you have any errors
+var.paths: ["/var/log/messages"]
+var.paths: ["/var/log/secure"]
+
+sudo systemctl status filebeat
+sudo systemctl enable filebeat 
+sudo filebeat setup
+sudo systemctl start filebeat
+sudo systemctl status filebeat
+
+# Go to kibana and click Check data
+# Go to kibana and click System logs dashboard > filebeat
+
+## Go to insfascracture > setup instructions > monitoring > loggins > System Logs
+Module status > check data > System logs dashboard
+
+# On client:
+sudo less /var/log/messages
+
+# Info for debian
+# Go to Infastructure > Setup Instructions > logging > System logs > DEB >
+sudo filebeat test config
+sudo filebeat test output
+sudo filebeat setup
+which logger
+
+sudo logger -t JUNGLE hello-hello-hello
+sudo tail /var/log/syslog
+
+______________________________________Metrics beat_____________________________________________________
+sudo yum install -y metrickbeat
+nano /etc/metricbeat/metricbeat.yml
+
+search kibana
+# Write kibana URL
+host: "192.168.0.102:5601"
+search Elasticsearch output
+hosts: ["192.168.0.102:9200"]
+
+sudo metricbeat test output
+nano /etc/metricbeat/modules.d/system.yml
+
+
+sudo systemctl status /metricbeat
+sudo systemctl enable /metricbeat
+sudo filebeat /metricbeat
+sudo systemctl start /metricbeat
+sudo systemctl status /metricbeat
+
+# Go to Dashboard > metricbeat > click any 
+
+____________________________________Apache logs________________________________________________________
+On server:
+
+Add log data > Apache logs > Deb/or/RPM > 
+# check plagins  geoip and user-agent
+docker exec dfc26b1510c6 ls /usr/share/elasticsearch/plugins
+
+$ingest-geoip
+$ingest-user-agent
+
+
+ls /usr/share/elasticsearch/plagins
+docker exec elasticsearch /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch ingest-geoip
+docker exec elasticsearch /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch user-agent
+
+
+on client:
+sudo rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
+sudo vi /etc/yum.repos.d/elastic.repo
+
+[elastic-6.x]
+name=Elastic repository for 6.x packages
+baseurl=https://artifacts.elastic.co/packages/6.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
+
+sudo yum install -y filebeat
+sudo systemctl enable filebeat
+sudo vi /etc/filebeat/filebeat.yml
+
+# Go to kibana and elasticsearch outputs and WRITE your host
+sudo filebeat modules list
+sudo filebeat modules enable apache2
+sudo filebeat modules enable system
+
+nano /etc/filebeat/modules.d/apache2.yml
+# uncomment:
+var.paths: ["/var/log/httpd/access_log"]
+var.paths: ["/var/log/httpd/error_log"]
+yum install httpd -y
+sudo filebeat setup
+systemctl status filebeat
+
+Go to kibana > dashboard > [Filebeat Apache2] Access and error logs
+Go to Discaver >
+
+yum install metricbeat -y
+nano /etc/metricbeat/metricbeat.yml
+#change to our ip in Kibana
+host:
+#change to our ip in Outputs
+host:
+
+sudo metricbeat test output
+sudo metricbeat modules list
+sudo metricbeat modules disable system
+sudo metricbeat modules enable apache
+
+nano /etc/metricbeat/modules.d/apache.yml
+# uncomment the two lines
+
+  metricsets:
+    - status
+
+sudo metricbeat test config
+sudo metricbeat setup
+
+# metricbeat apache looking for the page /server-status
+sudo systemctl start metricbeat
+sudo systemctl status metricbeat
+
+nano /etc/httpd/conf.modules.d/00-base.conf
+# check the module (uncomment if disabled)
+LoadModule status_module modules/mod_status.so
+
+nano /etc/httpd/conf/httpd.conf
+
+# Supplemental configuration
+#
+# Load config files in the "/etc/httpd/conf.d" directory, if any.
+IncludeOptional conf.d/*.conf
+
+<Location /server-status>
+  SetHandler server-status
+</Location>
+
+systemctl restart httpd
+Go to http://10.23.7.121/server-status
+```
+Apache Server Status for 10.23.7.121 (via 10.23.7.121)
+Server Version: Apache/2.4.6 (CentOS)
+Server MPM: prefork
+Server Built: Jul 29 2019 17:18:49
+Current Time: Friday, 16-Aug-2019 16:08:10 UTC
+Restart Time: Friday, 16-Aug-2019 16:07:12 UTC
+Parent Server Config. Generation: 1
+Parent Server MPM Generation: 0
+Server uptime: 57 seconds
+Server load: 0.00 0.01 0.03
+Total accesses: 6 - Total Traffic: 3 kB
+CPU Usage: u0 s0 cu0 cs0
+.105 requests/sec - 53 B/second - 512 B/request
+1 requests currently being processed, 5 idle workers
+```
+Go to Kibana > Dashboard > Metricbeat Apache
+
+______________________________________________Elasticalert_____________________
+Could be installed in any VM with access to elasticsearch
+
+# apt install filebeat -y
+# Do the same as above
+sudo filebeat modules enable system
+
+nano /etc/filebeat/modules.d/system.yml
+```
+  # Authorization logs
+  auth:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    var.paths: ["/path1","/path2"]
+```
+filebeat setup
+sudo systemctl start filebeat
+sudo systemctl status filebeat
+# Testing
+logger -t igor "test"
+# Go to kibana and check log
+
+
+
+# Go to kibana > index patterns > create index pattern > chose filebeat copy the name >
+# GO to https://elastalert.readthedocs.io/en/latest/ > Rule Types and Configuration Options > alerts > Running ElastAlert for the First Time
+yum -y install python-pip
+pip install "setuptools>=11.3"
+pip install pyOpenSSL
+git clone https://github.com/Yelp/elastalert.git
+pip install "elasticsearch>=5.0.0"
+python setup.py install
+
+# Change host
+nano config.yaml.example
+```
+# The Elasticsearch hostname for metadata writeback
+# Note that every rule can have its own Elasticsearch host
+es_host: 10.23.7.233
+
+# The Elasticsearch port
+es_port: 9200
+
+```
+# change config name and create index
+mv config.yaml.example config.yaml
+elastalert-create-index
+
+# Go to Kibana > menegment > index managment and you can see "elastalert_status_past" and etc....
+# Now let's create rules in git repository
+nano example_rules/example_frequency.yaml
+```
+
+name: igor
+
+type: frequency
+
+index: filebeat-*
+
+num_events: 3
+
+timeframe:
+  hours: 1
+
+filter:
+- term:
+    process.name: "igor"
+
+alert:
+- "slack"
+
+slack: 
+slack_webhook_url : "https://hooks.slack.com/services/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"
+slack_username_override: "anyuser"
+```
+
+# Filters events
+https://elastalert.readthedocs.io/en/latest/recipes/writing_filters.html?highlight=filters#common-filter-types
+
+# Fo to you slack > Add apps > Incoming WebHooks > Add configuration > chose chanell (devops) > Add >
+copy the hooks > Webhook URL https://hooks.slack.com/services/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
+Customize Name
+Choose the username that this integration will post as.
+devops-admin
+> SAVE IT
+
+sudo apt-get install python3-minimal
+sudo apt-get install python3-pip python3-dev libffi-dev libssl-dev
+sudo python3 setup.py install
+elastalert-test-rule --config config.yaml example_rules/example_frequency.yaml
+# Start as deamon 
+python3 -m elastalert.elastalert --verbose --rule example_frequency.yaml
+
+________________________________________@mail__________________________
+
+nano example_rules/example_frequency.yaml
+```
+name: igor
+
+type: frequency
+
+index: filebeat-*
+
+num_events: 3
+
+timeframe:
+  hours: 1
+
+filter:
+- term:
+    process.name: "igor"
+
+alert:
+- "email"
+
+email:
+  "snaap032@gmail.com"
+
+
+```
+python3 setup.py install
+elastalert-test-rule --config config.yaml example_rules/example_frequency.yaml
+sudo apt-get install postfix mailutils libsasl2-2 ca-certificates libsasl2-modules
+nano /etc/postfix/main.cf
+DELETE  relayhost=
+```
+inet_protocols = ipv4
+relayhost = [smtp.gmail.com]:587
+smtp_sasl_auth_enable = yes
+smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+smtp_sasl_security_options = noanonymous
+smtp_tls_CApath = /etc/ssl/certs
+smtpd_tls_CApath = /etc/ssl/certs
+smtp_use_tls = yes
+
+```
+nano /etc/postfix/sasl_passwd
+```
+[smtp.gmail.com]:587	
+server.jbs@gmail.com:qpdm vkxv hdpc boja
+sudo chmod 400 /etc/postfix/sasl_passwd
+sudo postmap /etc/postfix/sasl_passwd
+sudo systemctl restart postfix
+
+```
+echo "Testing" | mail -s "Test Email" snaap032@gmail.com
+sudo postqueue -p

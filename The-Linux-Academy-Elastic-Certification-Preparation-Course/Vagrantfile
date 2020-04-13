@@ -1,0 +1,26 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+ENV['VAGRANT_NO_PARALLEL'] = 'yes'
+
+Vagrant.configure(2) do |config|
+
+
+  config.vm.provision "shell", path: "bootstrap.sh"
+
+  NodeCount = 4
+  (1..NodeCount).each do |i|
+    config.vm.define "server#{i}" do |server|
+      server.vm.box = "centos/7"
+      server.vm.hostname = "server#{i}.example.com"
+      server.vm.network "public_network",
+        use_dhcp_assigned_default_route: true
+        server.vm.network "private_network", ip: "172.42.42.10#{i}"
+        server.vm.provider "virtualbox" do |vb|
+          vb.name = "server#{i}"
+          vb.memory = 1024
+          vb.cpus = 1
+        end
+      end
+    end
+end

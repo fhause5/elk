@@ -1,0 +1,1 @@
+{"rsync":{"/vagrant":{"type":"rsync","guestpath":"/vagrant","hostpath":"/home/snap/Videos/elk/The-Linux-Academy-Elastic-Certification-Preparation-Course","disabled":false,"__vagrantfile":true,"owner":"vagrant","group":"vagrant"}}}
